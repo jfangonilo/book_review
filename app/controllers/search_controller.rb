@@ -11,11 +11,9 @@ class SearchController < ApplicationController
       result.split('/')[2] if result.split('/')[1] == 'subjects'
     end
 
-    nyt_conn = Faraday.new('https://api.nytimes.com') do |f|
-      f.adapter Faraday.default_adapter
-    end
-    nyt_resp = nyt_conn.get("/svc/books/v3/reviews.json?api-key=#{ENV['NY_TIMES_API_KEY']}&title=#{result_title}")
-    nyt_result = JSON.parse(nyt_resp.body, symbolize_names: true)
+
+    nyt_service = NytService.new(result_title)
+    nyt_result = nyt_service.nyt_result
     result_summary = nyt_result[:results].map do |result|
       result[:summary]
     end
