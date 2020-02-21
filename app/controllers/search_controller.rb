@@ -7,12 +7,14 @@ class SearchController < ApplicationController
     response = conn.get("/search.json?q=#{title}")
     result = JSON.parse(response.body, symbolize_names: true)
     result_title = result[:docs].first[:title]
+    result_authors = result[:docs].first[:author_name]
+    result_genres = result[:docs].first[:seed]
 
     nyt_conn = Faraday.new('https://api.nytimes.com') do |f|
       f.adapter Faraday.default_adapter
     end
     nyt_resp = nyt_conn.get("/svc/books/v3/reviews.json?api-key=#{ENV['NY_TIMES_API_KEY']}&title=#{result_title}")
     nyt_result = JSON.parse(nyt_resp.body, symbolize_names: true)
-    result_summary = nyt_result[:results].first[:summary]
+    result_summary = nyt_result[:results]
   end
 end
