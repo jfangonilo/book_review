@@ -10,7 +10,7 @@ class SearchController < ApplicationController
     result_authors = result[:docs].first[:author_name]
     result_genres = result[:docs].first[:seed]
     parsed_genres = result_genres.map do |result|
-      result.split('/')[1]
+      result.split('/')[2] if result.split('/')[1] == 'subjects'
     end
 
     nyt_conn = Faraday.new('https://api.nytimes.com') do |f|
@@ -18,7 +18,10 @@ class SearchController < ApplicationController
     end
     nyt_resp = nyt_conn.get("/svc/books/v3/reviews.json?api-key=#{ENV['NY_TIMES_API_KEY']}&title=#{result_title}")
     nyt_result = JSON.parse(nyt_resp.body, symbolize_names: true)
-    result_summary = nyt_result[:results]
+    result_summary = nyt_result[:results].map do |result|
+      result[:summary]
+    end
+
     book_hash = {
       title: result_title,
       authors: result_authors,
