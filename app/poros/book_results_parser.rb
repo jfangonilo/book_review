@@ -6,19 +6,35 @@ class BookResultsParser
     @nyt_results = nyt_results
   end
 
+  def title
+    ol_results[:docs].first[:title]
+  end
+
+  def authors
+    ol_results[:docs].first[:author_name]
+  end
+
+  def genres
+    ol_results[:docs].first[:seed].map do |result|
+      result.split('/')[2] if result.split('/')[1] == 'subjects'
+    end
+  end
+
+  def summaries
+    nyt_results[:results].map do |result|
+      result[:summary]
+    end
+  end
+
   def final
     {
-      title: ol_results[:docs].first[:title],
+      title: title,
 
-      authors: ol_results[:docs].first[:author_name],
+      authors: authors,
 
-      genres: ol_results[:docs].first[:seed].map do |result|
-        result.split('/')[2] if result.split('/')[1] == 'subjects'
-      end,
+      genres: genres,
 
-      summaries: nyt_results[:results].map do |result|
-        result[:summary]
-      end
+      summaries: summaries
     }
   end
 end
