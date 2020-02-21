@@ -1,11 +1,9 @@
 class SearchController < ApplicationController
   def index
     title = params[:title]
-    conn = Faraday.new('http://openlibrary.org') do |f|
-      f.adapter Faraday.default_adapter
-    end
-    response = conn.get("/search.json?q=#{title}")
-    result = JSON.parse(response.body, symbolize_names: true)
+
+    ol_service = OpenLibraryService.new(title)
+    result = ol_service.result
     result_title = result[:docs].first[:title]
     result_authors = result[:docs].first[:author_name]
     result_genres = result[:docs].first[:seed]
